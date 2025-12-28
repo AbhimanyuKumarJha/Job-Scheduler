@@ -2,12 +2,12 @@ import express, { Express, Request, Response } from 'express';
 import * as dotenv from 'dotenv';
 import { testConnection } from './config/database';
 import { logger, createLogger } from './config/logger';
+import { setupSwagger } from './config/swagger';
 import { errorHandler, notFound } from './middleware/error.middleware';
 import { requestLogging } from './middleware/logging.middleware';
 import { SchedulerEngine } from './scheduler/scheduler-engine';
 import { setSchedulerEngine } from './controllers/health.controller';
 import apiRoutes from './routes';
-import healthRoutes from './routes/health.routes';
 
 dotenv.config();
 
@@ -20,18 +20,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogging);
 
+// Setup Swagger documentation
+setupSwagger(app);
+
 // Routes
 app.get('/', (req: Request, res: Response) => {
     res.json({
         message: 'Job Scheduler API is running!',
         version: '1.0.0',
-        documentation: '/api/v1',
+        documentation: '/docs',
+        apiSpec: '/docs/openapi.json',
+        health: '/api/v1/health'
     });
 });
 
 // API Routes
 app.use('/api/v1', apiRoutes);
-app.use('/api/v1', healthRoutes);
 
 // Error handling
 app.use(notFound);
