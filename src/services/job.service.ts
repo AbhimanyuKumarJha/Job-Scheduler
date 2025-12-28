@@ -3,7 +3,7 @@ import { jobs, jobExecutions, jobAuditLog } from '../db/schema';
 import { eq, desc, and, sql } from 'drizzle-orm';
 import { CreateJobInput, UpdateJobInput, JobQuery } from '../validators/schemas';
 import { createLogger } from '../config/logger';
-const cronParser = require('cron-parser');
+import { CronExpressionParser } from 'cron-parser';
 
 const serviceLogger = createLogger('JobService');
 
@@ -14,7 +14,7 @@ export class JobService {
 
             // Validate cron expression
             try {
-                cronParser.parseExpression(data.schedule);
+                CronExpressionParser.parse(data.schedule);
             } catch (error) {
                 throw new Error(`Invalid cron expression: ${error instanceof Error ? error.message : 'Unknown error'}`);
             }
@@ -60,7 +60,7 @@ export class JobService {
             // Calculate next scheduled run
             let nextScheduledRun = null;
             try {
-                const interval = cronParser.parseExpression(job.schedule);
+                const interval = CronExpressionParser.parse(job.schedule);
                 nextScheduledRun = interval.next().toDate();
             } catch (error) {
                 serviceLogger.warn('Failed to calculate next run', { jobId, error });
@@ -80,7 +80,7 @@ export class JobService {
             // Validate cron expression if provided
             if (data.schedule) {
                 try {
-                    cronParser.parseExpression(data.schedule);
+                    CronExpressionParser.parse(data.schedule);
                 } catch (error) {
                     throw new Error(`Invalid cron expression: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 }
