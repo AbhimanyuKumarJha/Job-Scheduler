@@ -1,4 +1,4 @@
-const cronParser = require('cron-parser');
+import { CronExpressionParser } from 'cron-parser';
 import { db } from '../config/database';
 import { jobs, jobExecutions, schedulerMetadata } from '../db/schema';
 import { eq, and, lte } from 'drizzle-orm';
@@ -131,7 +131,7 @@ export class SchedulerEngine {
             for (const job of activeJobs) {
                 try {
                     // Parse cron expression
-                    const interval = cronParser.parseExpression(job.schedule);
+                    const interval = CronExpressionParser.parse(job.schedule);
                     const nextRun = interval.next().toDate();
 
                     // Check if job should run now (within check interval)
