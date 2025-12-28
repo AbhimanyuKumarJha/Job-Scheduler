@@ -4,7 +4,6 @@ import { ExecutionController } from '../controllers/execution.controller';
 const router = Router();
 const executionController = new ExecutionController();
 
-// Execution detail routes
 router.get('/:executionId', executionController.getExecution.bind(executionController));
 
 export default router;
