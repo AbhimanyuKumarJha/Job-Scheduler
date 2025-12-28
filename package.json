@@ -1,7 +1,7 @@
 {
   "name": "job-scheduler",
   "version": "1.0.0",
-  "description": "",
+  "description": "Production-ready job scheduler with cron-based scheduling, retry policies, and comprehensive logging",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
@@ -11,22 +11,42 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:drop": "drizzle-kit drop",
+    "lint": "echo \"No linter configured yet\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "job-scheduler",
+    "cron",
+    "task-scheduler",
+    "job-queue",
+    "background-jobs",
+    "typescript",
+    "nodejs",
+    "postgresql"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "axios": "^1.13.2",
+    "cron-parser": "^5.4.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
     "express": "^5.2.1",
-    "pg": "^8.16.3"
+    "node-cron": "^4.2.1",
+    "pg": "^8.16.3",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",
+    "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.16.0",
+    "@types/uuid": "^10.0.0",
     "drizzle-kit": "^0.31.8",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
