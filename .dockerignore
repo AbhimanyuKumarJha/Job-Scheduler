@@ -1,0 +1,48 @@
+# Docker deployment files
+Dockerfile
+docker-compose.yml
+init-db.sql
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.docker
+
+# Logs
+logs/
+*.log
+
+# Build output
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Drizzle
+drizzle/
+
+# Temporary files
+tmp/
+temp/
+
+# Docker volumes
+postgres_data/

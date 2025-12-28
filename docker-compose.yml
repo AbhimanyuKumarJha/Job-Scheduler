@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: job-scheduler-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jobscheduler
+      POSTGRES_PASSWORD: jobscheduler_password
+      POSTGRES_DB: job_scheduler
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - job-scheduler-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobscheduler -d job_scheduler"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  job-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: job-scheduler-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://jobscheduler:jobscheduler_password@postgres:5432/job_scheduler
+      LOG_LEVEL: info
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-scheduler-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/v1/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  job-scheduler-network:
+    driver: bridge
