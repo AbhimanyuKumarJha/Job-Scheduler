@@ -57,7 +57,8 @@ export class JobController {
         try {
             const { jobId } = req.params;
             const validated = updateJobSchema.parse(req.body);
-            const job = await jobService.updateJob(jobId, validated, req.body.changedBy);
+            const changedBy = req.body?.changedBy || 'API';
+            const job = await jobService.updateJob(jobId, validated, changedBy);
 
             controllerLogger.info('Job updated via API', { jobId });
 
@@ -77,7 +78,8 @@ export class JobController {
     async deleteJob(req: Request, res: Response, next: NextFunction) {
         try {
             const { jobId } = req.params;
-            const job = await jobService.deleteJob(jobId, req.body.changedBy);
+            const changedBy = req.body?.changedBy || 'API';
+            const job = await jobService.deleteJob(jobId, changedBy);
 
             controllerLogger.info('Job deleted via API', { jobId });
 
@@ -146,6 +148,50 @@ export class JobController {
             });
         } catch (error) {
             controllerLogger.error('Failed to trigger job via API', {
+                jobId: req.params.jobId,
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            next(error);
+        }
+    }
+
+    async pauseJob(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { jobId } = req.params;
+            const changedBy = req.body?.changedBy || 'API';
+            const job = await jobService.updateJob(jobId, { status: 'PAUSED' }, changedBy);
+
+            controllerLogger.info('Job paused via API', { jobId });
+
+            res.json({
+                jobId: job.id,
+                status: job.status,
+                updatedAt: job.updatedAt,
+            });
+        } catch (error) {
+            controllerLogger.error('Failed to pause job via API', {
+                jobId: req.params.jobId,
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            next(error);
+        }
+    }
+
+    async resumeJob(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { jobId } = req.params;
+            const changedBy = req.body?.changedBy || 'API';
+            const job = await jobService.updateJob(jobId, { status: 'ACTIVE' }, changedBy);
+
+            controllerLogger.info('Job resumed via API', { jobId });
+
+            res.json({
+                jobId: job.id,
+                status: job.status,
+                updatedAt: job.updatedAt,
+            });
+        } catch (error) {
+            controllerLogger.error('Failed to resume job via API', {
                 jobId: req.params.jobId,
                 error: error instanceof Error ? error.message : 'Unknown error'
             });
